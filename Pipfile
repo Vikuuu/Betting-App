@@ -9,6 +9,7 @@ python-dotenv = "*"
 django-rest-framework = "*"
 drf-yasg = "*"
 gunicorn = "*"
+django-cors-headers = "*"
 
 [dev-packages]
 
