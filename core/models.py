@@ -4,12 +4,14 @@ from django.contrib.auth.models import (
     BaseUserManager,
     PermissionsMixin,
 )
-import uuid, random
+import uuid, random, secrets
+from django.contrib.auth.hashers import make_password
+from .validators import validate_phone_number
 
 
 class UserManager(BaseUserManager):
 
-    def create_user(self, mobile, password=None, **extra_fields):
+    def create_user(self, mobile, **extra_fields):
         """
         Creates and saves a User with the given email, date of
         birth and password.
@@ -19,18 +21,18 @@ class UserManager(BaseUserManager):
 
         user = self.model(mobile=mobile, **extra_fields)
 
-        user.set_password(password)
+        user.set_unusable_password()
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, mobile, password=None, **extra_fields):
+    def create_superuser(self, mobile, accountPin=None, **extra_fields):
         """
         Creates and saves a superuser with the given email, date of
         birth and password.
         """
         user = self.create_user(
             mobile=mobile,
-            password=password,
+            accountPin=accountPin,
         )
         user.is_staff = True
         user.is_superuser = True
@@ -44,15 +46,20 @@ class UserAccount(AbstractBaseUser):
         FEMALE = "F", "Female"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    mobile = models.CharField(max_length=10, unique=True)
+    access_medium = models.CharField(max_length=50, null=True, blank=True)
+    mobile = models.CharField(
+        max_length=10, unique=True, validators=[validate_phone_number]
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    otp = models.IntegerField()
+    otp = models.IntegerField(null=True, blank=True)
+    otp_verified = models.BooleanField(default=False)
     full_name = models.CharField(max_length=50)
-    dob = models.DateField()
+    dob = models.DateField(null=True, blank=True)
     gender = models.CharField(max_length=1, choices=Gender.choices, default=Gender.MALE)
     idNumber = models.CharField(max_length=50)
-    password = models.CharField(max_length=4, db_column="accountPin")
+    accountPin = models.CharField(max_length=4)
+    password = None
 
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
@@ -71,6 +78,14 @@ class UserAccount(AbstractBaseUser):
     def __str__(self) -> str:
         return self.full_name
 
+    def generate_access_medium(self):
+        self.access_medium = secrets.token_urlsafe(16)
+        self.save()
+
     def generate_otp(self):
         self.otp = random.randint(100000, 999999)
         self.save()
+
+    def set_password(self, raw_password):
+        self.accountPin = make_password(raw_password)
+        self._password = raw_password
