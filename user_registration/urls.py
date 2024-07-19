@@ -15,8 +15,8 @@ urlpatterns = [
         name="personal-detail",
     ),
     path(
-        "activate-user/<str:token>",
+        "user-activate/<str:token>",
         ActivateUserRegistrationView.as_view(),
-        name="activate-user",
+        name="user-activate",
     ),
 ]
