@@ -33,7 +33,7 @@ class PersonalDetailRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ["full_name", "dob", "gender", "accountPin"]
-        exctra_kwargs = {"accountPin": {"write_only": True}}
+        extra_kwargs = {"accountPin": {"write_only": True}}
 
     def update(self, instance, validated_data):
         instance.full_name = validated_data.get("full_name", instance.full_name)

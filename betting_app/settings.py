@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     # Local apps
     "core",
     "user_registration",
+    "user_login",
 ]
 
 MIDDLEWARE = [
@@ -147,3 +148,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "core.UserAccount"
 
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+
+AUTHENTICATION_BACKENDS = [
+    "user_login.authentication.MobileAuthBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
+
+REST_FRAMEWORK = {
+    "EXCEPTION_HANDLER": "user_login.exceptions.status_code_handler",
+}

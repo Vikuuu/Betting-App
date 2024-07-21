@@ -11,7 +11,7 @@ from .validators import validate_phone_number
 
 class UserManager(BaseUserManager):
 
-    def create_user(self, mobile, **extra_fields):
+    def create_user(self, mobile, accountPin=None, **extra_fields):
         """
         Creates and saves a User with the given email, date of
         birth and password.
@@ -21,7 +21,10 @@ class UserManager(BaseUserManager):
 
         user = self.model(mobile=mobile, **extra_fields)
 
-        user.set_unusable_password()
+        if accountPin:
+            user.set_password(accountPin)
+        else:
+            user.set_unusable_password()
         user.save(using=self._db)
         return user
 
@@ -33,6 +36,7 @@ class UserManager(BaseUserManager):
         user = self.create_user(
             mobile=mobile,
             accountPin=accountPin,
+            **extra_fields,
         )
         user.is_staff = True
         user.is_superuser = True
@@ -58,7 +62,7 @@ class UserAccount(AbstractBaseUser):
     dob = models.DateField(null=True, blank=True)
     gender = models.CharField(max_length=1, choices=Gender.choices, default=Gender.MALE)
     idNumber = models.CharField(max_length=50)
-    accountPin = models.CharField(max_length=4)
+    accountPin = models.CharField(max_length=4, blank=True)
     password = None
 
     is_active = models.BooleanField(default=False)
