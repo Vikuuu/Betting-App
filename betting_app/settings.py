@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "core",
     "user_registration",
     "user_login",
+    "wager",
 ]
 
 MIDDLEWARE = [
