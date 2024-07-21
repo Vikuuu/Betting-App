@@ -11,6 +11,7 @@ drf-yasg = "*"
 gunicorn = "*"
 django-cors-headers = "*"
 whitenoise = "*"
+pyjwt = "*"
 
 [dev-packages]
 
