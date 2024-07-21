@@ -1,47 +1,10 @@
 from django.db import models
-from django.contrib.auth.models import (
-    AbstractBaseUser,
-    BaseUserManager,
-    PermissionsMixin,
-)
-import uuid, random, secrets
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+import uuid
 from django.contrib.auth.hashers import make_password
 from .validators import validate_phone_number
-
-
-class UserManager(BaseUserManager):
-
-    def create_user(self, mobile, accountPin=None, **extra_fields):
-        """
-        Creates and saves a User with the given email, date of
-        birth and password.
-        """
-        if not mobile:
-            raise ValueError("Users must have an Mobile number")
-
-        user = self.model(mobile=mobile, **extra_fields)
-
-        if accountPin:
-            user.set_password(accountPin)
-        else:
-            user.set_unusable_password()
-        user.save(using=self._db)
-        return user
-
-    def create_superuser(self, mobile, accountPin=None, **extra_fields):
-        """
-        Creates and saves a superuser with the given email, date of
-        birth and password.
-        """
-        user = self.create_user(
-            mobile=mobile,
-            accountPin=accountPin,
-            **extra_fields,
-        )
-        user.is_staff = True
-        user.is_superuser = True
-        user.save(using=self._db)
-        return user
+from .helpers import generate_access_medium, generate_otp
+from .managers import UserManager
 
 
 class UserAccount(AbstractBaseUser):
@@ -83,11 +46,11 @@ class UserAccount(AbstractBaseUser):
         return self.full_name
 
     def generate_access_medium(self):
-        self.access_medium = secrets.token_urlsafe(16)
+        self.access_medium = generate_access_medium()
         self.save()
 
     def generate_otp(self):
-        self.otp = random.randint(100000, 999999)
+        self.otp = generate_otp()
         self.save()
 
     def set_password(self, raw_password):
