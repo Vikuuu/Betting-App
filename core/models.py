@@ -1,13 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 import uuid
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 from .validators import validate_phone_number
 from .helpers import generate_access_medium, generate_otp
 from .managers import UserManager
 
 
-class UserAccount(AbstractBaseUser):
+class UserAccount(AbstractBaseUser, PermissionsMixin):
     class Gender(models.TextChoices):
         MALE = "M", "Male"
         FEMALE = "F", "Female"
@@ -56,3 +56,6 @@ class UserAccount(AbstractBaseUser):
     def set_password(self, raw_password):
         self.accountPin = make_password(raw_password)
         self._password = raw_password
+
+    def check_password(self, raw_password):
+        return check_password(raw_password, self.accountPin)
