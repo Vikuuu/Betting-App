@@ -22,6 +22,7 @@ urlpatterns = [
     path("api/", include("core.urls")),
     path("api/registration/", include("user_registration.urls")),
     path("api/auth/", include("user_login.urls")),
+    path("api/wager/", include("wager.urls")),
     # swagger urls
     path(
         "swagger/",
