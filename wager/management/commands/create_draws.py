@@ -13,15 +13,15 @@ class Command(BaseCommand):
     def manage_draws(self):
         draw_times = {
             pick1.drawNameChoice.MORNING: {
-                "draw_time": time(9, 58),  # 9:00 AM
+                "draw_time": time(9, 59),  # 9:59 AM
                 "game_time": time(10, 0),  # 10:00 AM
             },
             pick1.drawNameChoice.AFTERNOON: {
-                "draw_time": time(13, 58),  # 1:00 PM
+                "draw_time": time(13, 59),  # 1:59 PM
                 "game_time": time(14, 0),  # 2:00 PM
             },
             pick1.drawNameChoice.EVENING: {
-                "draw_time": time(18, 58),  # 6:00 PM
+                "draw_time": time(18, 59),  # 6:59 PM
                 "game_time": time(19, 0),  # 7:00 PM
             },
         }
