@@ -48,10 +48,12 @@ INSTALLED_APPS = [
     "rest_framework",
     "drf_yasg",
     "corsheaders",
+    "django_crontab",
     # Local apps
     "core",
     "user_registration",
     "user_login",
+    "wager",
 ]
 
 MIDDLEWARE = [
@@ -133,10 +135,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = "static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
@@ -159,3 +161,8 @@ AUTHENTICATION_BACKENDS = [
 REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "user_login.exceptions.status_code_handler",
 }
+
+
+CRONJOBS = [
+    ("0 0 * * *", "django.core.management.call_command", ["manage_draws"]),
+]
