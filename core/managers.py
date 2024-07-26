@@ -24,7 +24,11 @@ class UserManager(BaseUserManager):
         """
         Creates and saves a superuser with the given email, date of
         birth and password.
+
         """
+        if accountPin is None:
+            accountPin = "0000"
+
         user = self.create_user(
             mobile=mobile,
             accountPin=accountPin,
@@ -32,5 +36,6 @@ class UserManager(BaseUserManager):
         )
         user.is_staff = True
         user.is_superuser = True
+        user.is_active = True
         user.save(using=self._db)
         return user

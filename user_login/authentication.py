@@ -14,7 +14,7 @@ class MobileAuthBackend:
     def authenticate(self, request, mobile=None, accountPin=None):
         try:
             user = get_user_model().objects.get(mobile=mobile)
-            if check_password(accountPin, user.accountPin):
+            if user.check_password(accountPin):
                 return user
             return None
         except (
@@ -79,8 +79,7 @@ class jwtTokens:
             return payload["user_id"]
         except Exception as e:
             raise exceptions.AuthenticationFailed(f"Unauthenticated {str(e)}")
-    
-    
+
     @staticmethod
     def decode_refresh_token(token):
         try:
