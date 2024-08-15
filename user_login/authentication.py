@@ -1,9 +1,11 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password
-import jwt, datetime
+import jwt
 from rest_framework import exceptions
 from rest_framework.authentication import BaseAuthentication, get_authorization_header
 from rest_framework.response import Response
+from django.utils import timezone
+from datetime import timedelta
 
 
 class MobileAuthBackend:
@@ -50,11 +52,12 @@ class jwtTokens:
 
     @staticmethod
     def create_access_token(id):
+        now = timezone.now()
         return jwt.encode(
             {
                 "user_id": str(id),
-                "exp": datetime.datetime.utcnow() + datetime.timedelta(seconds=120),
-                "iat": datetime.datetime.utcnow(),
+                "exp": now + timedelta(days=1),
+                "iat": now,
             },
             "access_secret",
             algorithm="HS256",
@@ -62,11 +65,12 @@ class jwtTokens:
 
     @staticmethod
     def create_refresh_token(id):
+        now = timezone.now()
         return jwt.encode(
             {
                 "user_id": str(id),
-                "exp": datetime.datetime.utcnow() + datetime.timedelta(days=7),
-                "iat": datetime.datetime.utcnow(),
+                "exp": now + timedelta(days=7),
+                "iat": now,
             },
             "refresh_secret",
             algorithm="HS256",

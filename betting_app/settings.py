@@ -166,3 +166,13 @@ REST_FRAMEWORK = {
 CRONJOBS = [
     ("0 0 * * *", "django.core.management.call_command", ["manage_draws"]),
 ]
+
+SWAGGER_SETTINGS = {
+    "SECURITY_DEFINITIONS": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+        }
+    }
+}
