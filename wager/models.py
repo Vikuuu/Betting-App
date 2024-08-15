@@ -1,5 +1,9 @@
 from django.db import models
 import uuid
+from django.conf import settings
+from .validators import pick_validation
+from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth import get_user_model
 
 
 class pick1(models.Model):
@@ -29,3 +33,31 @@ class pick1(models.Model):
 
     def __str__(self) -> str:
         return f"Draw Number: {self.draw_number}"
+
+
+class placingPick1(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="placingPick1",
+        # to_field="mobile",
+    )
+    draw_number = models.ForeignKey(
+        pick1, on_delete=models.CASCADE, related_name="placingpick1"
+    )
+    pick_number = models.SmallIntegerField(validators=[pick_validation])
+    is_confirmed = models.BooleanField(default=False)
+    bet_amount = models.PositiveIntegerField()
+
+    class Meta:
+        unique_together = ("user", "draw_number")
+
+    # @staticmethod
+    # def get_user_by_mobile(mobile):
+    #     try:
+    #         return get_user_model().objects.get(mobile=mobile)
+    #     except ObjectDoesNotExist:
+    #         return None
+
+    def __str__(self):
+        return f"{self.user.full_name} - Draw: {self.draw_number} - Pick: {self.pick_number}"
