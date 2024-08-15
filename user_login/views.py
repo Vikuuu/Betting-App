@@ -11,6 +11,7 @@ from django.contrib.auth import get_user_model
 from .authentication import JWTAuthentication
 from .models import UserToken
 import datetime
+from django.utils import timezone
 
 
 class UserLoginView(generics.GenericAPIView):
@@ -35,7 +36,7 @@ class UserLoginView(generics.GenericAPIView):
             UserToken.objects.create(
                 user_id=user.id,
                 token=refresh_token,
-                expired_at=datetime.datetime.utcnow() + datetime.timedelta(days=7),
+                expired_at=timezone.now() + datetime.timedelta(days=7),
             )
 
             response = Response()

@@ -30,8 +30,8 @@ class Command(BaseCommand):
             self.create_draw(draw_name, now, times)
 
     def create_draw(self, draw_name, now, times):
-        game_date_time = datetime.combine(now.date() + times["game_time"])
-        draw_date_time = datetime.combine(now.date() + times["draw_time"])
+        game_date_time = datetime.combine(now.date(), times["game_time"])
+        draw_date_time = datetime.combine(now.date(), times["draw_time"])
 
         new_draw = pick1.objects.create(
             draw_number=pick1.objects.count(),
