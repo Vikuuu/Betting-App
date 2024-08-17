@@ -46,7 +46,16 @@ class placingPick1View(generics.GenericAPIView):
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        return Response({"message": "Please confirm the Bet."})
+        return Response(
+            {
+                "message": "Please confirm the Bet.",
+                "data": {
+                    "pick_number": serializer.data["pick_number"],
+                    "bet_amount": serializer.data["bet_amount"],
+                    "draw_id": request.META.get("HTTP_DRAW_ID"),
+                },
+            }
+        )
 
 
 class confirmingPick1View(generics.GenericAPIView):
@@ -57,7 +66,7 @@ class confirmingPick1View(generics.GenericAPIView):
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter(
-                "Draw",
+                "draw-id",
                 openapi.IN_HEADER,
                 description="Draw id",
                 type=openapi.TYPE_STRING,
@@ -82,7 +91,7 @@ class confirmingPick1View(generics.GenericAPIView):
             data=data,
             context={
                 "user": request.user.id,
-                "draw_id": request.META.get("HTTP_DRAW"),
+                "draw_id": request.META.get("HTTP_DRAW_ID"),
                 "pick_number": request.META.get("HTTP_PICK_NUMBER"),
                 "bet_amount": request.META.get("HTTP_BET_AMOUNT"),
             },
