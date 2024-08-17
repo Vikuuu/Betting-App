@@ -42,15 +42,14 @@ class placingPick1(models.Model):
         related_name="placingPick1",
         # to_field="mobile",
     )
-    draw_number = models.ForeignKey(
+    draw_id = models.ForeignKey(
         pick1, on_delete=models.CASCADE, related_name="placingpick1"
     )
     pick_number = models.SmallIntegerField(validators=[pick_validation])
-    is_confirmed = models.BooleanField(default=False)
     bet_amount = models.PositiveIntegerField()
 
     class Meta:
-        unique_together = ("user", "draw_number")
+        unique_together = ("user", "draw_id")
 
     # @staticmethod
     # def get_user_by_mobile(mobile):

@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import pick1, placingPick1
+from .validators import pick_validation
+from django.contrib.auth import get_user_model
 
 
 class pick1Serializer(serializers.ModelSerializer):
@@ -15,39 +17,65 @@ class pick1Serializer(serializers.ModelSerializer):
         ]
 
 
-class placingPick1Serializer(serializers.ModelSerializer):
-    class Meta:
-        model = placingPick1
-        fields = ["user", "draw_number", "pick_number", "bet_amount"]
-        extra_kwargs = {
-            "user": {"write_only": True},
-            "draw_number": {"write_only": True},
-        }
+class placingPick1Serializer(serializers.Serializer):
+    pick_number = serializers.IntegerField(validators=[pick_validation])
+    bet_amount = serializers.IntegerField()
 
-    def create(self, validated_data):
-        bet_amount = validated_data.pop("bet_amount", 0) * 100
+    # class Meta:
+    #     model = placingPick1
+    #     fields = ["user", "draw_number", "pick_number", "bet_amount"]
+    #     extra_kwargs = {
+    #         "user": {"write_only": True},
+    #         "draw_number": {"write_only": True},
+    #     }
 
-        pick1_bet = placingPick1.objects.create(
-            **validated_data,
-            bet_amount=bet_amount,
-        )
-        return pick1_bet
+    # def create(self, validated_data):
+    #     bet_amount = validated_data.pop("bet_amount", 0) * 100
+
+    #     pick1_bet = placingPick1.objects.create(
+    #         **validated_data,
+    #         bet_amount=bet_amount,
+    #     )
+    #     return pick1_bet
 
 
 class confirmingPick1Serializer(serializers.ModelSerializer):
+    is_confirmed = serializers.BooleanField(default=False)
+
     class Meta:
         model = placingPick1
-        fields = ["is_confirmed"]
+        fields = [
+            # "user",
+            # "draw_id",
+            # "pick_number",
+            # "bet_amount",
+            "is_confirmed",
+        ]
+        # extra_kwargs = {
+        #     "user": {"write_only": True},
+        #     "draw_id": {"write_only": True},
+        #     "pick_number": {"write_only": True},
+        #     "bet_amount": {"write_only": True},
+        # }
+
+    # def to_representation(self, instance):
+    #     representation = super().to_representation(instance)
+    #     return {"is_confirmed": representation["is_confirmed"]}
 
     def create(self, validated_data):
-        user = self.context["user"]
-        draw_number = self.context["draw_number"]
-        try:
-            pick = placingPick1.objects.get(user=user, draw_number=draw_number)
-            pick.is_confirmed = True
+        is_confirmed = validated_data.pop("is_confirmed", None)
+        user_id = self.context.get("user")
+        user = get_user_model().objects.get(id=user_id)
+        draw_id = self.context.get("draw_id")
+        draw = pick1.objects.get(id=draw_id)
+        pick_number = self.context.get("pick_number")
+        bet_amount = self.context.get("bet_amount")
+        if is_confirmed:
+            pick = placingPick1.objects.create(
+                user=user,
+                draw_id=draw,
+                pick_number=pick_number,
+                bet_amount=bet_amount,
+            )
             pick.save()
             return pick
-        except placingPick1.DoesNotExist:
-            raise serializers.ValidationError(
-                "Pick record not found for the user and draw_number."
-            )

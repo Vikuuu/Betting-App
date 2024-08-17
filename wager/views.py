@@ -33,14 +33,20 @@ class placingPick1View(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [JWTAuthentication]
 
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "draw-id",
+                openapi.IN_HEADER,
+                description="Draw Id",
+                type=openapi.TYPE_STRING,
+            )
+        ]
+    )
     def post(self, request):
-        user = request.user
-        data = request.data
-        data["user"] = user.id
-        serializer = self.get_serializer(data=data)
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
+        return Response({"message": "Please confirm the Bet."})
 
 
 class confirmingPick1View(generics.GenericAPIView):
@@ -56,6 +62,18 @@ class confirmingPick1View(generics.GenericAPIView):
                 description="Draw id",
                 type=openapi.TYPE_STRING,
             ),
+            openapi.Parameter(
+                "pick-number",
+                openapi.IN_HEADER,
+                description="Pick Number",
+                type=openapi.TYPE_NUMBER,
+            ),
+            openapi.Parameter(
+                "bet-amount",
+                openapi.IN_HEADER,
+                description="Bet Amount",
+                type=openapi.TYPE_INTEGER,
+            ),
         ]
     )
     def post(self, request):
@@ -64,7 +82,9 @@ class confirmingPick1View(generics.GenericAPIView):
             data=data,
             context={
                 "user": request.user.id,
-                "draw_number": request.headers["Draw"],
+                "draw_id": request.META.get("HTTP_DRAW"),
+                "pick_number": request.META.get("HTTP_PICK_NUMBER"),
+                "bet_amount": request.META.get("HTTP_BET_AMOUNT"),
             },
         )
         serializer.is_valid(raise_exception=True)
