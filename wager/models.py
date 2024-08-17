@@ -35,28 +35,25 @@ class pick1(models.Model):
         return f"Draw Number: {self.draw_number}"
 
 
-class placingPick1(models.Model):
+class CustomerWager(models.Model):
+    class Pick(models.TextChoices):
+        PICK_1 = "P1", "Pick 1"
+        PICK_4 = "P4", "Pick 4"
+
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="placingPick1",
-        # to_field="mobile",
     )
     draw_id = models.ForeignKey(
         pick1, on_delete=models.CASCADE, related_name="placingpick1"
     )
+    pick_name = models.CharField(max_length=2, choices=Pick.choices)
     pick_number = models.SmallIntegerField(validators=[pick_validation])
     bet_amount = models.PositiveIntegerField()
 
     class Meta:
         unique_together = ("user", "draw_id")
-
-    # @staticmethod
-    # def get_user_by_mobile(mobile):
-    #     try:
-    #         return get_user_model().objects.get(mobile=mobile)
-    #     except ObjectDoesNotExist:
-    #         return None
 
     def __str__(self):
         return f"{self.user.full_name} - Draw: {self.draw_number} - Pick: {self.pick_number}"
