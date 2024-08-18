@@ -39,6 +39,17 @@ class confirmingPick1Serializer(serializers.ModelSerializer):
         draw = pick1.objects.get(id=draw_id)
         pick_number = self.context.get("pick_number")
         bet_amount = self.context.get("bet_amount")
+
+        existing_wager = CustomerWager.objects.filter(
+            user=user,
+            draw_id=draw,
+        ).first()
+
+        if existing_wager:
+            raise serializers.ValidationError(
+                "This User already has a wager for this draw."
+            )
+
         if is_confirmed:
             pick = CustomerWager.objects.create(
                 user=user,

@@ -40,7 +40,7 @@ class CustomerWager(models.Model):
         PICK_1 = "P1", "Pick 1"
         PICK_4 = "P4", "Pick 4"
 
-    user = models.OneToOneField(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="customer_wager",
@@ -58,4 +58,4 @@ class CustomerWager(models.Model):
         unique_together = ("user", "draw_id")
 
     def __str__(self):
-        return f"{self.user.full_name} - Draw: {self.draw_number} - Pick: {self.pick_number}"
+        return f"{self.user.full_name} - Draw: {self.draw_id} - Pick: {self.pick_number}"
