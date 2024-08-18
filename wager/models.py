@@ -43,10 +43,12 @@ class CustomerWager(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="placingPick1",
+        related_name="customer_wager",
     )
     draw_id = models.ForeignKey(
-        pick1, on_delete=models.CASCADE, related_name="placingpick1"
+        pick1,
+        on_delete=models.CASCADE,
+        related_name="customer_wagers",
     )
     pick_name = models.CharField(max_length=2, choices=Pick.choices)
     pick_number = models.SmallIntegerField(validators=[pick_validation])

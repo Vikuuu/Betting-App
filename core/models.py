@@ -5,6 +5,8 @@ from django.contrib.auth.hashers import make_password, check_password
 from .validators import validate_phone_number
 from .helpers import generate_access_medium, generate_otp
 from .managers import UserManager
+from django.conf import settings
+from wager.models import CustomerWager
 
 
 class UserAccount(AbstractBaseUser, PermissionsMixin):
@@ -59,3 +61,29 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
 
     def check_password(self, raw_password):
         return check_password(raw_password, self.accountPin)
+
+
+class Transactions(models.Model):
+    class TransactionType(models.TextChoices):
+        BET = "bet", "Bet"
+        DEPOSIT = "deposit", "Deposit"
+        PAYOUT = "payout", "Payout"
+        WITHDRAWAL = "withdrawal", "Withdrawal"
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+    type = models.CharField(max_length=10, choices=TransactionType.choices)
+    amount = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    bet_id = models.ForeignKey(
+        CustomerWager,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+
+    def __str__(self):
+        return f"{self.user.username} - Type: {type}"
