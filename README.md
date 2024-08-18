@@ -1,4 +1,4 @@
-# Betting App
+# Betting App 🎲
 
 ## Overview
 
